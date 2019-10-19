@@ -31,9 +31,9 @@ export class Database {
       useFindAndModify: false,
       useCreateIndex: true,
       useNewUrlParser: true,
-      useUnifiedTopology: true
-      // pass: process.env.DB_PASS || '',
-      // user: process.env.DB_USER || '',
+      useUnifiedTopology: true,
+      user: process.env.DB_USER,
+      pass: process.env.DB_PASS,
     })
       .then(() => {
         logger.info('Connection to database successful');
