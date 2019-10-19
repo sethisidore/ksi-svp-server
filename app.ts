@@ -33,6 +33,13 @@ class App {
     this.routes = new RouteHandler();
     this.routes.init(this.app, passport);
 
+    // catch all favicon requests and ignore them
+    this.app.use((req: Request, res: Response, next: NextFunction) => {
+      if(req.originalUrl === '/favicon.ico') {
+        res.status(204).json({ none: true });
+      } else { next(); }
+    });
+
     // catch 404 and forward to error handler
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       const err = new Error('Not Found: Requested resource does not exist!!!');
@@ -103,7 +110,7 @@ class App {
     }));
     this.app.use(hpp());
     this.app.use(cors({
-      origin: ['localhost', 'http:localhost:8100']
+      origin: ['localhost', 'http://localhost:8100']
     }));
     this.app.use(passport.initialize());
     // this.app.use(express.static(path.join(__dirname, '../../dist/polac')));
