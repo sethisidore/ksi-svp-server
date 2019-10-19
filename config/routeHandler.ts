@@ -16,11 +16,6 @@ export class RouteHandler {
     app.use('/api/voting', /*passport.authenticate('validate', { session: false }),*/ VotingRouter);
 
     app.use('/api/support', MonitoringRouter);
-    app.use('/api/error', passport.authenticate('validate', { session: false }));
-
-    /* Front-End Application: Send all other request to Angular
-    app.get('*', (req: Request, res: Response) => {
-      res.sendFile(path.join(__dirname, '../../../dist/polac/index.html'));
-    });*/
+    app.use('/api/error', passport.authenticate('admin', { session: false }));
   }
 }
