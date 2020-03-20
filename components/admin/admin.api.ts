@@ -4,7 +4,29 @@ import { Router } from "express";
 import { asyncHandler, multerUploader } from "../../config";
 import { AdminController } from "./admin.controller";
 
+/** 
+ * for admin authentication
+*/
 class AdminAPI {
+  router: Router;
+  handler: AdminController;
+
+  constructor() {
+    this.router = Router();
+    this.handler = new AdminController();
+    this.init();
+  }
+  
+  init () {
+    this.router.post('/login', asyncHandler(this.handler.adminLogin));
+    this.router.get('/logout', asyncHandler(this.handler.adminLogout));
+  }
+}
+
+/** 
+ * For managing resources by authorized admins
+*/
+class AdminMgtAPI {
   router: Router;
   handler: AdminController;
 
@@ -15,9 +37,6 @@ class AdminAPI {
   }
 
   init() {
-    this.router.post('/login', asyncHandler(this.handler.adminLogin));
-    this.router.get('/logout', asyncHandler(this.handler.adminLogout));
-
     this.router.get('/parties', /*passport.authenticate('admin', { session: false }),*/ asyncHandler(this.handler.fetchAllParties));
     this.router.get('/parties/:id', /*passport.authenticate('admin', { session: false }),*/ asyncHandler(this.handler.fetchParty));
     this.router.delete('/parties/:id', /* passport.authenticate('admin', { session: false }),*/
@@ -30,3 +49,4 @@ class AdminAPI {
 }
 
 export const AdminRouter = new AdminAPI().router;
+export const AdminMgtRouter = new AdminMgtAPI().router;

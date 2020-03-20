@@ -6,6 +6,7 @@ import Joi from '@hapi/joi';
 import * as jwt from 'jsonwebtoken';
 import { SignOptions } from "jsonwebtoken";
 import passport from "passport";
+import * as fs from 'fs';
 
 import { User, UserType } from "./user.model";
 
@@ -37,6 +38,12 @@ export class AuthController {
       return res.status(400).json({ error, value });
     }
     const { password, ...payload } = body;
+    // check if vin exist first
+    const electoralList = JSON.parse(fs.readFileSync('./voter-list.json').toString());
+    const isValidVIN: VoterType = electoralList.voters.find((key: VoterType) =>  key.vin === payload.vin);
+    if (!isValidVIN) return res.status(400).json({ message: 'Invalid VIN entered!'})
+    payload.regWard = isValidVIN.regWard;
+    
     const user = new User(payload);
     await user.setPassword(password);
     await user.save();
@@ -130,15 +137,24 @@ export class AuthController {
  * schemas for validation using joi
  **/
 const $__LoginSchema: Joi.ObjectSchema = Joi.object().keys({
-  username: Joi.string().pattern(/[A-Za-z][A-za-Z0-9_]{2,50}/).required(),
-  password: Joi.string().pattern(/[a-ZA-z0-9_#*&%@()!$*]{4,100}/).required(),
+  username: Joi.string().pattern(/[A-Za-z][A-Za-z0-9_]{2,50}/).required(),
+  password: Joi.string().pattern(/[A-Za-z0-9_#*&%@()!$*]{4,100}/).required(),
   otp: Joi.string().pattern(/[0-9]{8}/).optional()
 });
 
 const $__UserSchema: Joi.ObjectSchema = Joi.object().keys({
-  password: Joi.string().pattern(/[a-ZA-z0-9_#*&%@()!$*]{4,100}/).required(),
+  username: Joi.string().pattern(/[A-Za-z][A-Za-z0-9_]{2,50}/).required(),
+  password: Joi.string().pattern(/[A-Za-z0-9_#*&%@()!$*]{4,100}/).required(),
   confirmPassword: Joi.ref('password'),
   vin: Joi.string().pattern(/[A-Z0-9]{8}[0-9]{12}/).required(),
-  email: Joi.string().email().required(),
-  contact: Joi.string().pattern(/\+234(([7-9]0)|81)([1-7]|9)[0-9]{7}/).required()
+  contact: Joi.string().pattern(/\+234(([7-9]0)|81)([1-7]|9)[0-9]{7}/).required(),
+  publicKey: Joi.string().optional()
 });
+
+/**
+ * type for authenticating voter's vin
+ */
+interface VoterType {
+  vin: string;
+  regWard: string;
+}

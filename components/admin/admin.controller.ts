@@ -137,5 +137,5 @@ const $__PartySchema: Joi.ObjectSchema = Joi.object().keys({
 
 const $__AdminSchema: Joi.ObjectSchema = Joi.object().keys({
   email: Joi.string().email().required(),
-  password: Joi.string().pattern(/[a-ZA-z0-9_#*&%@()!$*]{4,100}/).required(),
+  password: Joi.string().pattern(/[A-Za-z0-9_#*&%@()!$*]{4,100}/).required(),
 });
